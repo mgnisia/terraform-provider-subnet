@@ -24,6 +24,6 @@ data "subnet_list" "test" {
 }
 ```
 
-with `data.subnet_list.included` you get a boolean which tells you whether the given IP is included in the given subnet
-with `data.subnet_list.included_subnet_index` you get the index (int) which of the given subnets in the cidr_list includes the given IP
-with `data.subnet_list.included_subnet_cidr` you get the cidr (string) which of the given subnets in the cidr_list includes the given IP
+- with `data.subnet_list.included` you get a boolean which tells you whether the given IP is included in the given subnet
+- with `data.subnet_list.included_subnet_index` you get the index (int) which of the given subnets in the cidr_list includes the given IP
+- with `data.subnet_list.included_subnet_cidr` you get the cidr (string) which of the given subnets in the cidr_list includes the given IP
