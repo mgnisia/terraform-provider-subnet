@@ -26,6 +26,16 @@ func Test_checkCIDR(t *testing.T) {
 	assert.True(t, res)
 }
 
+func Test_MinMax(t *testing.T) {
+	testList := []int{0, 0, 1}
+	min, max, idxMin, idxMax, err := MinMax(testList)
+	assert.Equal(t, 0, min)
+	assert.Equal(t, 1, max)
+	assert.Equal(t, 0, idxMin)
+	assert.Equal(t, 2, idxMax)
+	assert.Error(t, err)
+}
+
 func Test_subnet_single(t *testing.T) {
 	name := "data.subnet_single.test"
 	resource.UnitTest(t, resource.TestCase{

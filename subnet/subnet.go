@@ -94,3 +94,45 @@ checkList:
 	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
 	return diags
 }
+
+func MinMax(cidrlist []int) (min, max, idxMin, idxMax int, err error) {
+	max = cidrlist[0]
+	min = cidrlist[0]
+	err = nil
+	for idx, value := range cidrlist {
+		if max < value {
+			max = value
+			idxMax = idx
+		} else if min > value {
+			idxMin = idx
+			min = value
+		} else if value == max || value == min {
+			err = fmt.Errorf("found duplicated value")
+		}
+	}
+	return min, max, idxMin, idxMax, err
+}
+
+func dataSubnetCompareRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
+	cidrCount, err := getCount("cidr_list.#", d, diags)
+	if err != nil {
+		diag.FromErr(err)
+	}
+	// Get largest cidr
+	cdirs := make([]int, 0)
+	for i := 0; i < cidrCount; i++ {
+		cidrValueCurrent, err := getValue(fmt.Sprintf("cidr_list.%d", i), d, diags)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		_, net, err := net.ParseCIDR(cidrValueCurrent)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		size, _ := net.Mask.Size()
+		cdirs = append(cdirs, size)
+	}
+	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
+	return diags
+}
