@@ -94,3 +94,60 @@ checkList:
 	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
 	return diags
 }
+
+func MinMax(cidrlist []int) (min, max, idxMin, idxMax int) {
+	max = cidrlist[0]
+	min = cidrlist[0]
+	for idx, value := range cidrlist {
+		if max < value {
+			max = value
+			idxMax = idx
+		} else if min > value {
+			idxMin = idx
+			min = value
+		}
+	}
+	return min, max, idxMin, idxMax
+}
+
+func dataSubnetCompareRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
+	cidrCount, err := getCount("cidr_list.#", d, diags)
+	if err != nil {
+		diag.FromErr(err)
+	}
+	// Get largest cidr
+	cidrSize := make([]int, 0)
+	cidrs := make([]string, 0)
+	for i := 0; i < cidrCount; i++ {
+		cidrValueCurrent, err := getValue(fmt.Sprintf("cidr_list.%d", i), d, diags)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		_, net, err := net.ParseCIDR(cidrValueCurrent)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		size, _ := net.Mask.Size()
+		cidrs = append(cidrs, cidrValueCurrent)
+		cidrSize = append(cidrSize, size)
+	}
+	// To obtain the largest and lowest cidr in the list
+	// we assume that comparing the subnet size e.g /20 vs /24 is sufficient
+	_, _, idxMin, idxMax := MinMax(cidrSize)
+	// the lowest means in the networking context the larget subnet
+	if err := d.Set("cidr_largest", cidrs[idxMin]); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("cidr_largest_index", idxMin); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("cidr_lowest", cidrs[idxMax]); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("cidr_lowest_index", idxMax); err != nil {
+		return diag.FromErr(err)
+	}
+	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
+	return diags
+}

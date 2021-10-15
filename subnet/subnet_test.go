@@ -26,6 +26,22 @@ func Test_checkCIDR(t *testing.T) {
 	assert.True(t, res)
 }
 
+func Test_MinMax(t *testing.T) {
+	testList := []int{0, 0, 1}
+	min, max, idxMin, idxMax := MinMax(testList)
+	assert.Equal(t, 0, min)
+	assert.Equal(t, 1, max)
+	assert.Equal(t, 0, idxMin)
+	assert.Equal(t, 2, idxMax)
+
+	testList = []int{10, 1}
+	min, max, idxMin, idxMax = MinMax(testList)
+	assert.Equal(t, 1, min)
+	assert.Equal(t, 10, max)
+	assert.Equal(t, 1, idxMin)
+	assert.Equal(t, 0, idxMax)
+}
+
 func Test_subnet_single(t *testing.T) {
 	name := "data.subnet_single.test"
 	resource.UnitTest(t, resource.TestCase{
@@ -68,6 +84,32 @@ data "subnet_list" "test" {
 					resource.TestCheckResourceAttr(name, "included", "true"),
 					resource.TestCheckResourceAttr(name, "included_subnet_cidr", "10.69.32.0/20"),
 					resource.TestCheckResourceAttr(name, "included_subnet_index", "0"),
+				),
+			},
+		},
+	})
+}
+
+func Test_subnet_compare(t *testing.T) {
+	name := "data.subnet_compare.test"
+	resource.UnitTest(t, resource.TestCase{
+		Providers: testProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: `
+data "subnet_compare" "test" {
+	cidr_list = ["10.69.32.0/20","10.69.32.0/24","10.69.32.0/30"]
+}
+				`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(name, "cidr_list.0", "10.69.32.0/20"),
+					resource.TestCheckResourceAttr(name, "cidr_list.1", "10.69.32.0/24"),
+					resource.TestCheckResourceAttr(name, "cidr_list.2", "10.69.32.0/30"),
+					resource.TestCheckResourceAttr(name, "cidr_list.#", "3"),
+					resource.TestCheckResourceAttr(name, "cidr_largest", "10.69.32.0/20"),
+					resource.TestCheckResourceAttr(name, "cidr_largest_index", "0"),
+					resource.TestCheckResourceAttr(name, "cidr_lowest", "10.69.32.0/30"),
+					resource.TestCheckResourceAttr(name, "cidr_lowest_index", "2"),
 				),
 			},
 		},
