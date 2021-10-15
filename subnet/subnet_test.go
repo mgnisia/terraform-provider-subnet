@@ -28,12 +28,18 @@ func Test_checkCIDR(t *testing.T) {
 
 func Test_MinMax(t *testing.T) {
 	testList := []int{0, 0, 1}
-	min, max, idxMin, idxMax, err := MinMax(testList)
+	min, max, idxMin, idxMax := MinMax(testList)
 	assert.Equal(t, 0, min)
 	assert.Equal(t, 1, max)
 	assert.Equal(t, 0, idxMin)
 	assert.Equal(t, 2, idxMax)
-	assert.Error(t, err)
+
+	testList = []int{10, 1}
+	min, max, idxMin, idxMax = MinMax(testList)
+	assert.Equal(t, 1, min)
+	assert.Equal(t, 10, max)
+	assert.Equal(t, 1, idxMin)
+	assert.Equal(t, 0, idxMax)
 }
 
 func Test_subnet_single(t *testing.T) {

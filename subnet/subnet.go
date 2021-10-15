@@ -95,10 +95,9 @@ checkList:
 	return diags
 }
 
-func MinMax(cidrlist []int) (min, max, idxMin, idxMax int, err error) {
+func MinMax(cidrlist []int) (min, max, idxMin, idxMax int) {
 	max = cidrlist[0]
 	min = cidrlist[0]
-	err = nil
 	for idx, value := range cidrlist {
 		if max < value {
 			max = value
@@ -106,11 +105,9 @@ func MinMax(cidrlist []int) (min, max, idxMin, idxMax int, err error) {
 		} else if min > value {
 			idxMin = idx
 			min = value
-		} else if value == max || value == min {
-			err = fmt.Errorf("found duplicated value")
 		}
 	}
-	return min, max, idxMin, idxMax, err
+	return min, max, idxMin, idxMax
 }
 
 func dataSubnetCompareRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
