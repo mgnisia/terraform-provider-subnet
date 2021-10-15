@@ -21,13 +21,15 @@ func dataSubnetCompareSet() *schema.Resource {
 		ReadContext: dataSubnetCompareRead,
 		Schema: map[string]*schema.Schema{
 			"cidr_list": {
-				Type:     schema.TypeString,
-				Computed: false,
+				Type:     schema.TypeList,
 				Required: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
 			},
 			"cidr_largest": {
 				Type:     schema.TypeString,
-				Required: true,
+				Computed: true,
 			},
 			"cidr_lowest": {
 				Type:     schema.TypeString,
@@ -35,7 +37,7 @@ func dataSubnetCompareSet() *schema.Resource {
 			},
 			"cidr_largest_index": {
 				Type:     schema.TypeInt,
-				Required: true,
+				Computed: true,
 			},
 			"cidr_lowest_index": {
 				Type:     schema.TypeInt,

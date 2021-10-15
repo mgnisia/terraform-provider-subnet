@@ -89,3 +89,29 @@ data "subnet_list" "test" {
 		},
 	})
 }
+
+func Test_subnet_compare(t *testing.T) {
+	name := "data.subnet_compare.test"
+	resource.UnitTest(t, resource.TestCase{
+		Providers: testProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: `
+data "subnet_compare" "test" {
+	cidr_list = ["10.69.32.0/20","10.69.32.0/24","10.69.32.0/30"]
+}
+				`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(name, "cidr_list.0", "10.69.32.0/20"),
+					resource.TestCheckResourceAttr(name, "cidr_list.1", "10.69.32.0/24"),
+					resource.TestCheckResourceAttr(name, "cidr_list.2", "10.69.32.0/30"),
+					resource.TestCheckResourceAttr(name, "cidr_list.#", "3"),
+					resource.TestCheckResourceAttr(name, "cidr_largest", "10.69.32.0/20"),
+					resource.TestCheckResourceAttr(name, "cidr_largest_index", "0"),
+					resource.TestCheckResourceAttr(name, "cidr_lowest", "10.69.32.0/30"),
+					resource.TestCheckResourceAttr(name, "cidr_lowest_index", "2"),
+				),
+			},
+		},
+	})
+}
